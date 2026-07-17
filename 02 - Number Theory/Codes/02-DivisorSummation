@@ -23,23 +23,41 @@ typedef long long ll;
 const int M = 5 * 1e6;
 vector<int> sieve(M+1, 0);
 
+// 1. Create a sieve storing the Smallest Prime Factor (SPF) for every number.
+// 2. Prime factorize n using the SPF array and find the exponent (alpha) of each prime.
+// 3. For each prime p^alpha, compute its divisor-sum contribution using the GP formula:
+//      1 + p + p² + ... + p^alpha = (p^(alpha+1) - 1) / (p - 1)
+// 4. Multiply the contribution of all prime factors to get the sum of all divisors,
+//    then subtract n to obtain the sum of proper divisors.
+
 void precompute(){
 	
-	for(int i=1; i<= M; i++){
-		for(int j=i; j<=M; j+=i){
-			sieve[j] += i;
+	for(int i=2; i<=M; i++){
+		if(sieve[i] == 0){
+			for(int j=i; j<=M; j+=i){
+				if(sieve[j] == 0) sieve[j] = i;
+			}
 		}
 	}
-	
-	// for(auto it: sieve) cout << it << " ";
-	// cout << endl;
 }
  
  
 void solve(){
 		int n; cin >> n;
+		int res = 1, t = n;
 		
-		cout << sieve[n]-n << endl;
+		while(sieve[n] != 0){
+			int alpha = 1, spf = sieve[n];
+			
+			while(n % spf == 0){
+				alpha++;
+				n /= spf;
+			}
+			
+			res *= (pow(spf, alpha) - 1)/ (spf - 1);
+		}
+		
+		cout << res - t << endl;
 }
  
 int32_t main(){
